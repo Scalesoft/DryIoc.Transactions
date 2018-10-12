@@ -18,7 +18,7 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			_PerTransactionScopeContextBase = perTransactionScopeContextBase;
 		}
 
-		public int Lifespan => 50;
+		public abstract int Lifespan { get; }
 
 		public object Name => null;
 
@@ -63,6 +63,8 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 		{
 		}
 
+		public override int Lifespan => 50;
+
 		public static readonly Lazy<Expr> PerTransactionReuseExpr = new Lazy<Expr>(() =>
 			Expr.Property(null, typeof(AutoTxReuse).GetPropertyOrNull("PerTransaction")));
 
@@ -77,6 +79,8 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 		public PerTopTransactionReuse(PerTopTransactionScopeContext perTopTransactionScopeContext) : base(perTopTransactionScopeContext)
 		{
 		}
+
+		public override int Lifespan => 55;
 
 		public static readonly Lazy<Expr> PerTopTransactionReuseExpr = new Lazy<Expr>(() =>
 			Expr.Property(null, typeof(AutoTxReuse).GetPropertyOrNull("PerTopTransaction")));
