@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading;
 using System.Transactions;
 using DryIoc.Facilities.AutoTx;
 using DryIoc.Facilities.NHibernate.Errors;
@@ -24,7 +25,7 @@ using NHibernate;
 
 namespace DryIoc.Facilities.NHibernate
 {
-	using ITransaction = DryIoc.Transactions.ITransaction;
+	using ITransaction = Transactions.ITransaction;
 
 	/// <summary>
 	/// 	The session manager is an object wrapper around the "real" manager which is managed
@@ -35,7 +36,7 @@ namespace DryIoc.Facilities.NHibernate
 	{
 		private readonly Func<ISession> _GetSession;
 		private readonly ITransactionManager _TransactionManager;
-		private readonly ISessionStore _SessionStore;
+		private readonly Func<UnitOfWorkStore> _UowStore;
 		private readonly AutoTxOptions _AutoTxOptions;
 		private readonly ILogger _Logger;
 
@@ -44,17 +45,17 @@ namespace DryIoc.Facilities.NHibernate
 		/// </summary>
 		/// <param name = "getSession"></param>
 		/// <param name="transactionManager"></param>
-		/// <param name="sessionStore"></param>
+		/// <param name="uowStore"></param>
 		/// <param name="autoTxOptions"></param>
 		/// <param name="logger"></param>
-		public SessionManager(Func<ISession> getSession, ITransactionManager transactionManager, ISessionStore sessionStore, AutoTxOptions autoTxOptions, ILogger logger)
+		public SessionManager(Func<ISession> getSession, ITransactionManager transactionManager, Func<UnitOfWorkStore> uowStore, AutoTxOptions autoTxOptions, ILogger logger)
 		{
 			Contract.Requires(getSession != null);
 			Contract.Ensures(this._GetSession != null);
 
 			_GetSession = getSession;
 			_TransactionManager = transactionManager;
-			_SessionStore = sessionStore;
+			_UowStore = uowStore;
 			_AutoTxOptions = autoTxOptions;
 			_Logger = logger;
 		}
@@ -76,7 +77,7 @@ namespace DryIoc.Facilities.NHibernate
 			}
 			else
 			{
-				var session = GetStoredSession();
+				var session = GetStoredSession(transaction.Value);
 
 				//There is an active transaction but no session is created yet
 				if (session == null)
@@ -88,10 +89,34 @@ namespace DryIoc.Facilities.NHibernate
 							"The Func<ISession> passed to SessionManager returned a null session. Verify your registration.");
 
 					//Store the session so I can reused
-					StoreSession(session);
+					var uow = StoreSession(transaction.Value, session);
 
-					//Attach to the TransactionEvent so I can clean the callcontext
-					transaction.Value.Inner.TransactionCompleted += Inner_TransactionCompleted;
+					//Attach to the TransactionEvent for finishing transaction (commit or rollback)
+					var unitOfWorkStore = _UowStore.Invoke();
+					transaction.Value.Inner.TransactionCompleted += (sender, args) =>
+					{
+						try
+						{
+							var removedUow = unitOfWorkStore.GetAndClear(transaction.Value);
+							if (removedUow != uow)
+							{
+								_Logger.LogCritical("Removed different UoW from store than UoW prepared to finish!");
+								throw new InvalidOperationException("Removed different UoW from store than UoW prepared to finish!");
+							}
+
+							FinishStoredSession(uow, args.Transaction.TransactionInformation.Status);
+						}
+						catch (HibernateException exception)
+						{
+							_Logger.LogWarning(exception, "Error in the O-R persistence layer in NHibernate");
+							throw;
+						}
+						catch (Exception exception)
+						{
+							_Logger.LogWarning(exception, "Unknown error");
+							throw;
+						}
+					};
 					
 					return session;
 				}
@@ -103,30 +128,12 @@ namespace DryIoc.Facilities.NHibernate
 		}
 
 		/// <summary>
-		/// Clear the CallContext when the transaction ends
-		/// </summary>
-		/// <param name="sender">Just event stuff</param>
-		/// <param name="e">Just event stuff</param>
-		void Inner_TransactionCompleted(object sender, TransactionEventArgs e)
-		{
-			try
-			{
-				FinishStoredSession(e.Transaction.TransactionInformation.Status);
-			}
-			catch (HibernateException exception)
-			{
-				_Logger.LogWarning(exception, "Error in the O-R persistence layer in NHibernate");
-				throw;
-			}
-		}
-
-		/// <summary>
 		/// Gets the current transaction from de AutoTx facility via an ITransactionManager
 		/// </summary>
 		/// <returns>The current transaction</returns>
 		private Maybe<ITransaction> ObtainCurrentTransaction()
 		{
-			return _TransactionManager.CurrentTransaction;
+			return _TransactionManager.CurrentTopTransaction;
 		}
 
 		private IUnitOfWork CreateUnitOfWork(ISession session)
@@ -143,32 +150,39 @@ namespace DryIoc.Facilities.NHibernate
 		}
 
 		/// <summary>
-		/// Stores a session in the CallContext
+		/// Stores a session
 		/// </summary>
+		/// <param name="transaction">current transaction</param>
 		/// <param name="session">current session</param>
-		private void StoreSession(ISession session)
+		private IUnitOfWork StoreSession(ITransaction transaction, ISession session)
 		{
 			var unitOfWork = CreateUnitOfWork(session);
-			_SessionStore.SetData(unitOfWork);
+			var uowStore = _UowStore.Invoke();
+			uowStore.Add(transaction, unitOfWork);
+			return unitOfWork;
 		}
 
 		/// <summary>
-		/// Retrieves the session stored in the callcontext
+		/// Retrieves the session
 		/// </summary>
+		/// <param name="transaction">current transaction</param>
 		/// <returns></returns>
-		private ISession GetStoredSession()
+		private ISession GetStoredSession(ITransaction transaction)
 		{
-			return _SessionStore.GetData()?.CurrentSession;
+			var uowStore = _UowStore.Invoke();
+			var uow = uowStore.TryGet(transaction);
+			return uow?.CurrentSession;
 		}
 
 		/// <summary>
-		/// Removes the session stored in the callcontext
+		/// Removes the session from store
 		/// </summary>
+		/// <param name="unitOfWork"></param>
 		/// <param name="transactionStatus"></param>
 		/// <returns></returns>
-		private void FinishStoredSession(TransactionStatus transactionStatus)
+		private void FinishStoredSession(IUnitOfWork unitOfWork, TransactionStatus transactionStatus)
 		{
-			using (var unitOfWork = _SessionStore.GetAndClearData())
+			using (unitOfWork)
 			{
 				switch (transactionStatus)
 				{
