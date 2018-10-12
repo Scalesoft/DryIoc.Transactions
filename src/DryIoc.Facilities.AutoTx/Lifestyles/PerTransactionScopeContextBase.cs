@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -12,14 +12,14 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 	public abstract class PerTransactionScopeContextBase : IScopeContext
 	{
 		private readonly object _LockObject = new object();
-		private readonly Dictionary<string, Scope> _ScopePerTransactionIdStorage;
+		private readonly ConcurrentDictionary<string, Scope> _ScopePerTransactionIdStorage;
 		private readonly ILogger _Logger;
 		protected bool _Disposed;
 
 		public PerTransactionScopeContextBase(ILogger logger)
 		{
 			_Logger = logger;
-			_ScopePerTransactionIdStorage = new Dictionary<string, Scope>();
+			_ScopePerTransactionIdStorage = new ConcurrentDictionary<string, Scope>();
 		}
 
 		public abstract string RootScopeName { get; }
@@ -62,11 +62,16 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 
 			lock (_LockObject)
 			{
+				if (_ScopePerTransactionIdStorage.TryGetValue(key, out scope))
+				{
+					return scope;
+				}
+
 				if (_Logger.IsEnabled(LogLevel.Debug))
 					_Logger.LogDebug($"Scope for key '{key}' not found in per-tx storage. Creating new Scope instance.");
 
 				scope = new Scope(name: RootScopeName);
-				_ScopePerTransactionIdStorage.Add(key, scope);
+				_ScopePerTransactionIdStorage.TryAdd(key, scope);
 
 				transaction.Inner.TransactionCompleted += (sender, args) =>
 				{
@@ -78,7 +83,7 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 						var scopeFromStorage = _ScopePerTransactionIdStorage[key];
 						if (!_Disposed)
 						{
-							_ScopePerTransactionIdStorage.Remove(key);
+							_ScopePerTransactionIdStorage.TryRemove(key, out _);
 							scopeFromStorage.Dispose();
 						}
 					}

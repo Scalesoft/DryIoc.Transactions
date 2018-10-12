@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
 using DryIoc.Facilities.NHibernate.UnitOfWork;
 using DryIoc.Transactions;
 
@@ -6,16 +7,18 @@ namespace DryIoc.Facilities.NHibernate
 {
 	public class UnitOfWorkStore
 	{
-		private readonly Dictionary<string, IUnitOfWork> _Store;
+		private readonly ConcurrentDictionary<string, IUnitOfWork> _Store;
 
 		public UnitOfWorkStore()
 		{
-			_Store = new Dictionary<string, IUnitOfWork>();
+			_Store = new ConcurrentDictionary<string, IUnitOfWork>();
 		}
 
 		public void Add(ITransaction transaction, IUnitOfWork unitOfWork)
 		{
-			_Store.Add(transaction.LocalIdentifier, unitOfWork);
+			var success = _Store.TryAdd(transaction.LocalIdentifier, unitOfWork);
+			if (!success)
+				throw new ArgumentException($"Transaction {transaction.LocalIdentifier} has already assigned UnitOfWork");
 		}
 
 		public IUnitOfWork TryGet(ITransaction transaction)
@@ -26,8 +29,7 @@ namespace DryIoc.Facilities.NHibernate
 
 		public IUnitOfWork GetAndClear(ITransaction transaction)
 		{
-			var unitOfWork = _Store[transaction.LocalIdentifier];
-			_Store.Remove(transaction.LocalIdentifier);
+			_Store.TryRemove(transaction.LocalIdentifier, out var unitOfWork);
 			return unitOfWork;
 		}
 	}
