@@ -148,6 +148,8 @@ namespace DryIoc.Transactions.Activities
 			get { return (uint) _Txs.Count; }
 		}
 
+		public Guid ActivityId => _ActivityId;
+
 		[Pure]
 		public bool Equals(Activity other)
 		{

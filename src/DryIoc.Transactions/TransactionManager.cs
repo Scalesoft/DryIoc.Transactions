@@ -15,6 +15,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using DryIoc.Transactions.Internal;
@@ -76,7 +77,7 @@ namespace DryIoc.Transactions
 		Maybe<ICreatedTransaction> ITransactionManager.CreateTransaction(ITransactionOptions transactionOptions)
 		{
 			var activity = _activityManager.GetCurrentActivity();
-
+			
 			if (transactionOptions.Mode == TransactionScopeOption.Suppress)
 				return Maybe.None<ICreatedTransaction>();
 
@@ -85,12 +86,17 @@ namespace DryIoc.Transactions
 
 			ITransaction tx;
 			if (activity.Count == 0)
-				tx = new Transaction(new CommittableTransaction(new TransactionOptions
-					{
-						IsolationLevel = transactionOptions.IsolationLevel,
-						Timeout = transactionOptions.Timeout
-					}), nextStackDepth, transactionOptions, () => activity.Pop(),
-				                     _loggerFactory.CreateChildLogger("Transaction", GetType()));
+			{
+				var sysTx = new CommittableTransaction(new TransactionOptions
+				{
+					IsolationLevel = transactionOptions.IsolationLevel,
+					Timeout = transactionOptions.Timeout
+				});
+				_logger.LogDebug($"Created new system transaction with ID={sysTx.TransactionInformation.LocalIdentifier}, activityID={activity.ActivityId}, threadId={Thread.CurrentThread.ManagedThreadId}");
+
+				tx = new Transaction(sysTx, nextStackDepth, transactionOptions, () => activity.Pop(),
+					_loggerFactory.CreateChildLogger("Transaction", GetType()));
+			}
 			else
 			{
 				var clone = activity

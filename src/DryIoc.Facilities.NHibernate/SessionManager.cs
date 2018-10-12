@@ -63,7 +63,7 @@ namespace DryIoc.Facilities.NHibernate
 		ISession ISessionManager.OpenSession()
 		{
 			Maybe<ITransaction> transaction = ObtainCurrentTransaction();
-
+			
 			//This is a new transaction or no transaction is required
 			if (!transaction.HasValue)
 			{
@@ -77,6 +77,8 @@ namespace DryIoc.Facilities.NHibernate
 			}
 			else
 			{
+				_Logger.LogDebug($"Open session for transaction with ID={transaction.Value.LocalIdentifier}, thread={Thread.CurrentThread.ManagedThreadId}, stack=> {Environment.StackTrace}");
+
 				var session = GetStoredSession(transaction.Value);
 
 				//There is an active transaction but no session is created yet
@@ -156,6 +158,7 @@ namespace DryIoc.Facilities.NHibernate
 		/// <param name="session">current session</param>
 		private IUnitOfWork StoreSession(ITransaction transaction, ISession session)
 		{
+			_Logger.LogDebug($"Storing session, transactionID={transaction.LocalIdentifier}, ");
 			var unitOfWork = CreateUnitOfWork(session);
 			var uowStore = _UowStore.Invoke();
 			uowStore.Add(transaction, unitOfWork);
