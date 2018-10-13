@@ -100,14 +100,14 @@ namespace DryIoc.Facilities.AutoTx
 			_Logger.LogDebug(
 				@"Initialized AutoTxFacility:
 
-If you are experiencing problems, go to https://github.com/castleproject/Castle.Transactions and file a ticket for the Transactions project.
+If you are experiencing problems, go to https://github.com/Scalesoft/DryIoc.Transactions and file a ticket for the Transactions project.
 You can enable verbose logging for .Net by adding this to you .config file:
 
 	<system.diagnostics>
 		<sources>
 			<source name=""System.Transactions"" switchValue=""Information"">
 				<listeners>
-					<add name=""tx"" type=""Castle.Transactions.Logging.TraceListener, Castle.Transactions""/>
+					<add name=""tx"" type=""DryIoc.Transactions.Logging.TraceListener, DryIoc.Transactions""/>
 				</listeners>
 			</source>
 		</sources>

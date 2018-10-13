@@ -19,6 +19,14 @@ namespace DryIoc.Facilities.AutoTx.Extensions
 			    request => request.Parent.ImplementationType));
 		}
 
+		/// <summary>
+		/// Method for resetting Activity. Required for example for ASP.NET Core (after using Transaction in Startup class).
+		/// </summary>
+	    public static void ResetAutoTxActivityContext(this IContainer container)
+		{
+			container.Resolve<IActivityManager>().ResetActivity();
+		}
+
 	    public static void Release(this IContainer container, object instance)
 	    {
 			// TODO probably not required
