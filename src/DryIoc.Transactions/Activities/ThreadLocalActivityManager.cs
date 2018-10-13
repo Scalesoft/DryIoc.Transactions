@@ -23,12 +23,7 @@ namespace DryIoc.Transactions.Activities
 	public class ThreadLocalActivityManager : IActivityManager
 	{
 		private static readonly ThreadLocal<Activity> _ThreadLocalActivity = new ThreadLocal<Activity>();
-
-		public ThreadLocalActivityManager()
-		{
-			_ThreadLocalActivity.Value = null;
-		}
-
+		
 		public Activity GetCurrentActivity()
 		{
 			var activity = _ThreadLocalActivity.Value;
@@ -46,6 +41,11 @@ namespace DryIoc.Transactions.Activities
 		{
 			var activity = new Activity(NullLogger.Instance);
 			_ThreadLocalActivity.Value = activity;
+		}
+
+		public void ResetActivity()
+		{
+			_ThreadLocalActivity.Value = null;
 		}
 	}
 }

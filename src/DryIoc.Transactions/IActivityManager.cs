@@ -18,5 +18,10 @@ namespace DryIoc.Transactions
 		///		Force creating new activity (new scope)
 		/// </summary>
 		void CreateNewActivity();
+
+		/// <summary>
+		///		Force removing activity (force finish scope)
+		/// </summary>
+		void ResetActivity();
 	}
 }

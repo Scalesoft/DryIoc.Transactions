@@ -10,11 +10,6 @@ namespace DryIoc.Transactions.Activities
 	{
 		private static readonly AsyncLocal<Activity> _AsyncLocalActivity = new AsyncLocal<Activity>();
 
-		public AsyncLocalActivityManager()
-		{
-			_AsyncLocalActivity.Value = null;
-		}
-
 		public Activity GetCurrentActivity()
 		{
 			var activity = _AsyncLocalActivity.Value;
@@ -32,6 +27,11 @@ namespace DryIoc.Transactions.Activities
 		{
 			var activity = new Activity(NullLogger.Instance);
 			_AsyncLocalActivity.Value = activity;
+		}
+
+		public void ResetActivity()
+		{
+			_AsyncLocalActivity.Value = null;
 		}
 	}
 }

@@ -38,5 +38,9 @@ namespace DryIoc.Transactions.Tests.TestClasses
 		public void CreateNewActivity()
 		{
 		}
+
+		public void ResetActivity()
+		{
+		}
 	}
 }

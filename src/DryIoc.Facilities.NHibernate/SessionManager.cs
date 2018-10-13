@@ -14,7 +14,6 @@
 
 using System;
 using System.Diagnostics.Contracts;
-using System.Threading;
 using System.Transactions;
 using DryIoc.Facilities.AutoTx;
 using DryIoc.Facilities.NHibernate.Errors;
@@ -77,8 +76,6 @@ namespace DryIoc.Facilities.NHibernate
 			}
 			else
 			{
-				_Logger.LogDebug($"Open session for transaction with ID={transaction.Value.LocalIdentifier}, thread={Thread.CurrentThread.ManagedThreadId}, stack=> {Environment.StackTrace}");
-
 				var session = GetStoredSession(transaction.Value);
 
 				//There is an active transaction but no session is created yet
@@ -158,7 +155,6 @@ namespace DryIoc.Facilities.NHibernate
 		/// <param name="session">current session</param>
 		private IUnitOfWork StoreSession(ITransaction transaction, ISession session)
 		{
-			_Logger.LogDebug($"Storing session, transactionID={transaction.LocalIdentifier}, ");
 			var unitOfWork = CreateUnitOfWork(session);
 			var uowStore = _UowStore.Invoke();
 			uowStore.Add(transaction, unitOfWork);
