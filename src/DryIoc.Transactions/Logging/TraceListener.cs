@@ -1,11 +1,11 @@
 ﻿// Copyright 2004-2012 Castle Project, Henrik Feldt &contributors - https://github.com/castleproject
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
@@ -22,14 +23,16 @@ namespace DryIoc.Transactions.Logging
 	[Serializable]
 	public class TraceRecord
 	{
+#pragma warning disable CA2235
 		public string TraceIdentifier { get; set; }
 		public string Description { get; set; }
 		public string AppDomain { get; set; }
 		public string ExtendedData { get; set; }
+#pragma warning restore CA2235
 
 		public override string ToString()
 		{
-			return string.Format("{0}: {1}", Description, ExtendedData);
+			return string.Format(CultureInfo.InvariantCulture, "{0}: {1}", Description, ExtendedData);
 		}
 	}
 
@@ -37,9 +40,11 @@ namespace DryIoc.Transactions.Logging
 	{
 		public override void Write(string message)
 		{
-			if (message.StartsWith("System.Transactions Verbose: 0 : "))
-				Console.Write("Sys.Tx: ({1}) {0}", message.Substring("System.Transactions Verbose: 0 : ".Length),
-				              DateTime.UtcNow.ToString("mm:ss.fffff"));
+			if (message.StartsWith("System.Transactions Verbose: 0 : ", false, CultureInfo.InvariantCulture))
+				Console.Write(
+					"Sys.Tx: ({1}) {0}", message.Substring("System.Transactions Verbose: 0 : ".Length),
+					DateTime.UtcNow.ToString("mm:ss.fffff", CultureInfo.InvariantCulture)
+				);
 			else Console.Write(message);
 		}
 
@@ -47,7 +52,7 @@ namespace DryIoc.Transactions.Logging
 		{
 			TraceRecord r = null;
 
-			if (message.StartsWith("<TraceRecord"))
+			if (message.StartsWith("<TraceRecord", false, CultureInfo.InvariantCulture))
 				using (var s = new StringReader(message))
 				{
 					r =
@@ -63,18 +68,15 @@ namespace DryIoc.Transactions.Logging
 		protected virtual string GetData(string message)
 		{
 			if (!message.Contains("<ExtendedData")) return string.Empty;
-			var start = message.IndexOf("<ExtendedData");
+			var start = message.IndexOf("<ExtendedData", StringComparison.InvariantCulture);
 			if (start < 0) return message;
 			var endString = "</ExtendedData>";
-			var end = message.IndexOf(endString);
+			var end = message.IndexOf(endString, StringComparison.InvariantCulture);
 			if (end < 0) return message;
 			var removeOuter = new Regex(">(.*)<");
 			return removeOuter.Match(message.Substring(start, (end + endString.Length) - start)).Groups[1].Value;
 		}
 
-		public override bool IsThreadSafe
-		{
-			get { return true; }
-		}
+		public override bool IsThreadSafe => true;
 	}
 }

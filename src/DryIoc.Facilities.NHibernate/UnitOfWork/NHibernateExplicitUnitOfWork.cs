@@ -3,7 +3,7 @@ using NHibernate;
 
 namespace DryIoc.Facilities.NHibernate.UnitOfWork
 {
-	public class NHibernateExplicitUnitOfWork : IUnitOfWork
+	public sealed class NHibernateExplicitUnitOfWork : IUnitOfWork
 	{
 		private readonly ISession _Session;
 		private ITransaction _Transaction;

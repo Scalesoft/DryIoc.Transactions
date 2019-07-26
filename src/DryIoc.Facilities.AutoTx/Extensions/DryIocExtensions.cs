@@ -27,6 +27,7 @@ namespace DryIoc.Facilities.AutoTx.Extensions
 			container.Resolve<IActivityManager>().ResetActivity();
 		}
 
+		[Obsolete("Not used, will be removed in future release")]
 	    public static void Release(this IContainer container, object instance)
 	    {
 			// TODO probably not required

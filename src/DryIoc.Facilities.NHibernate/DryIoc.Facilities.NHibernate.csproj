@@ -49,7 +49,7 @@
     <Copyright>(c) 2015 by Henrik Feldt</Copyright>
     <Authors>Henrik Feldt</Authors>
     <PackageProjectUrl>https://github.com/Misterinecompany/DryIoc.Transactions</PackageProjectUrl>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageOutputPath>..\..\build\</PackageOutputPath>
@@ -58,6 +58,7 @@
     <None Include="..\..\buildscripts\CastleKey.snk">
       <Link>CastleKey.snk</Link>
     </None>
+    <None Include="..\..\License.txt" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NHibernate" Version="5.1.3" />

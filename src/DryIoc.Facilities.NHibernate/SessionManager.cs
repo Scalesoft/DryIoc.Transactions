@@ -1,11 +1,11 @@
 ﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,10 +59,10 @@ namespace DryIoc.Facilities.NHibernate
 			_Logger = logger;
 		}
 
-		ISession ISessionManager.OpenSession()
+		public ISession OpenSession()
 		{
 			Maybe<ITransaction> transaction = ObtainCurrentTransaction();
-			
+
 			//This is a new transaction or no transaction is required
 			if (!transaction.HasValue)
 			{
@@ -116,7 +116,7 @@ namespace DryIoc.Facilities.NHibernate
 							throw;
 						}
 					};
-					
+
 					return session;
 				}
 				else
@@ -140,7 +140,7 @@ namespace DryIoc.Facilities.NHibernate
 			switch (_AutoTxOptions.AmbientTransaction)
 			{
 				case AmbientTransactionOption.Enabled:
-					return new NHibernateImplictUnitOfWork(session);
+					return new NHibernateImplicitUnitOfWork(session);
 				case AmbientTransactionOption.Disabled:
 					return new NHibernateExplicitUnitOfWork(session);
 				default:
@@ -179,6 +179,7 @@ namespace DryIoc.Facilities.NHibernate
 		/// <param name="unitOfWork"></param>
 		/// <param name="transactionStatus"></param>
 		/// <returns></returns>
+#pragma warning disable CA1822
 		private void FinishStoredSession(IUnitOfWork unitOfWork, TransactionStatus transactionStatus)
 		{
 			using (unitOfWork)
@@ -198,6 +199,6 @@ namespace DryIoc.Facilities.NHibernate
 				}
 			}
 		}
-
+#pragma warning restore CA1822
 	}
 }

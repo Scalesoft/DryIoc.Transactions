@@ -1,13 +1,13 @@
 ﻿#region license
 
 // Copyright 2004-2012 Castle Project, Henrik Feldt &contributors - https://github.com/castleproject
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +31,7 @@ namespace DryIoc.Transactions
 	public class Transaction : ITransaction, IDependentAware
 	{
 		private readonly ILogger _Logger;
+#pragma warning disable CA2235
 		private TransactionState _State = TransactionState.Default;
 
 		private readonly ITransactionOptions _CreationOptions;
@@ -38,6 +39,7 @@ namespace DryIoc.Transactions
 		private readonly DependentTransaction _Dependent;
 		private List<Task> _DependentTasks;
 		private readonly string _LocalIdentifier;
+#pragma warning restore CA2235
 
 		[NonSerialized] private readonly Action _OnDispose;
 
@@ -85,7 +87,7 @@ namespace DryIoc.Transactions
 
 		/**
 		 * Possible state changes
-		 * 
+		 *
 		 * Default -> Constructed
 		 * Constructed -> Disposed
 		 * Constructed -> Active
@@ -107,7 +109,7 @@ namespace DryIoc.Transactions
 				finally
 				{
 					// the question is; does committable transaction object to being disposed on exceptions?
-					((IDisposable) this).Dispose(); 
+					((IDisposable) this).Dispose();
 				}
 			}
 			finally
@@ -185,7 +187,7 @@ namespace DryIoc.Transactions
 					if (_Logger.IsEnabled(LogLevel.Debug))
 						_Logger.LogDebug($"committing committable tx#{_LocalIdentifier}");
 
-					if (beforeTopComplete != null) 
+					if (beforeTopComplete != null)
 						beforeTopComplete();
 
 					if (_DependentTasks != null && _CreationOptions.DependentOption == DependentCloneOption.BlockCommitUntilComplete)
@@ -246,7 +248,7 @@ namespace DryIoc.Transactions
 			if (_DependentTasks == null)
 				// the number of processor cores * 2 is a reasonable assumption if people are using the Fork=true option.
 				_DependentTasks = new List<Task>(Environment.ProcessorCount * 2);
-			
+
 			_DependentTasks.Add(task);
 		}
 
@@ -256,20 +258,18 @@ namespace DryIoc.Transactions
 			GC.SuppressFinalize(this);
 		}
 
-		private void Dispose(bool isManaged)
+		protected virtual void Dispose(bool isManaged)
 		{
 			if (!isManaged)
 				return;
 
 			_Logger.LogDebug("disposing");
 
-			if (_DependentTasks != null) 
-				_DependentTasks.Clear();
+			_DependentTasks?.Clear();
 
 			try
 			{
-				if (_OnDispose != null) 
-					_OnDispose();
+				_OnDispose?.Invoke();
 
 				Inner.Dispose();
 			}

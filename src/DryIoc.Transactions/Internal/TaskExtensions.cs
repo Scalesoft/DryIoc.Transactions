@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DryIoc.Transactions.Internal
@@ -7,8 +8,15 @@ namespace DryIoc.Transactions.Internal
 	{
 		public static Task IgnoreExceptions(this Task task)
 		{
-			task.ContinueWith(c => { var ignored = c.Exception; },
-				TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+			task.ContinueWith(
+				c =>
+				{
+					var ignored = c.Exception;
+				},
+				CancellationToken.None,
+				TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+				TaskScheduler.Default
+			);
 			return task;
 		}
 	}

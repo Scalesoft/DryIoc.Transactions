@@ -1,13 +1,13 @@
 ﻿#region license
 
 // Copyright 2004-2012 Castle Project, Henrik Feldt &contributors - https://github.com/castleproject
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,8 +33,10 @@ namespace DryIoc.Transactions.Activities
 	{
 		readonly ILogger _Logger;
 
+#pragma warning disable CA2235
 		readonly Guid _ActivityId = Guid.NewGuid();
 		readonly Stack<Tuple<ITransaction, string>> _Txs = new Stack<Tuple<ITransaction, string>>();
+#pragma warning restore CA2235
 		ITransaction _TopMost;
 
 		public Activity(ILogger logger)
@@ -75,9 +77,9 @@ namespace DryIoc.Transactions.Activities
 
 			var aware = _TopMost as IDependentAware;
 
-			if (aware != null) 
+			if (aware != null)
 				aware.RegisterDependent(task);
-			else _Logger.LogWarning("The transaction#{0} did not implement Castle.Services.Transaction.Internal.IDependentAware, " 
+			else _Logger.LogWarning("The transaction#{0} did not implement Castle.Services.Transaction.Internal.IDependentAware, "
 				+ "yet a Task to await was registered. If you have created your own custom ITransaction implementation, verify that it implements IDependentAware.",
 				_TopMost.LocalIdentifier);
 		}

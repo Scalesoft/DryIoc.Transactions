@@ -2,9 +2,9 @@
 
 namespace DryIoc.Facilities.NHibernate.UnitOfWork
 {
-	public class NHibernateImplictUnitOfWork : IUnitOfWork
+	public sealed class NHibernateImplicitUnitOfWork : IUnitOfWork
 	{
-		public NHibernateImplictUnitOfWork(ISession session)
+		public NHibernateImplicitUnitOfWork(ISession session)
 		{
 			CurrentSession = session;
 		}
@@ -15,7 +15,7 @@ namespace DryIoc.Facilities.NHibernate.UnitOfWork
 		{
 			CurrentSession.Dispose();
 		}
-		
+
 		public void Commit()
 		{
 		}

@@ -14,15 +14,15 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 		private readonly object _LockObject = new object();
 		private readonly ConcurrentDictionary<string, Scope> _ScopePerTransactionIdStorage;
 		private readonly ILogger _Logger;
-		protected bool _Disposed;
+		protected bool Disposed { get; private set; }
 
-		public PerTransactionScopeContextBase(ILogger logger)
+		protected PerTransactionScopeContextBase(ILogger logger)
 		{
 			_Logger = logger;
 			_ScopePerTransactionIdStorage = new ConcurrentDictionary<string, Scope>();
 		}
 
-		public abstract string RootScopeName { get; }
+		protected abstract string RootScopeName { get; }
 
 		protected abstract Maybe<ITransaction> GetSemanticTransaction();
 
@@ -35,7 +35,7 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 
 		public IScope GetCurrentOrDefault(Type serviceType)
 		{
-			if (_Disposed)
+			if (Disposed)
 				throw new ObjectDisposedException("PerTransactionLifestyleManagerBase",
 					"You cannot resolve with a disposed lifestyle.");
 
@@ -81,7 +81,7 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 					lock (_LockObject)
 					{
 						var scopeFromStorage = _ScopePerTransactionIdStorage[key];
-						if (!_Disposed)
+						if (!Disposed)
 						{
 							_ScopePerTransactionIdStorage.TryRemove(key, out _);
 							scopeFromStorage.Dispose();
@@ -104,14 +104,14 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			GC.SuppressFinalize(this);
 		}
 
-		private void Dispose(bool managed)
+		protected virtual void Dispose(bool managed)
 		{
-			Contract.Ensures(!managed || _Disposed);
+			Contract.Ensures(!managed || Disposed);
 
 			if (!managed)
 				return;
 
-			if (_Disposed)
+			if (Disposed)
 			{
 				if (_Logger.IsEnabled(LogLevel.Information))
 				{
@@ -152,7 +152,7 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			}
 			finally
 			{
-				_Disposed = true;
+				Disposed = true;
 			}
 		}
 	}
@@ -167,11 +167,11 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			_TransactionManager = transactionManager;
 		}
 
-		public override string RootScopeName => ScopeContextName;
+		protected override string RootScopeName => ScopeContextName;
 
 		protected override Maybe<ITransaction> GetSemanticTransaction()
 		{
-			if (_Disposed)
+			if (Disposed)
 				throw new ObjectDisposedException(nameof(PerTransactionScopeContext),
 					"The lifestyle manager is disposed and cannot be used.");
 
@@ -189,11 +189,11 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			_TransactionManager = transactionManager;
 		}
 
-		public override string RootScopeName => ScopeContextName;
+		protected override string RootScopeName => ScopeContextName;
 
 		protected override Maybe<ITransaction> GetSemanticTransaction()
 		{
-			if (_Disposed)
+			if (Disposed)
 				throw new ObjectDisposedException(nameof(PerTopTransactionScopeContext),
 					"The lifestyle manager is disposed and cannot be used.");
 

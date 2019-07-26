@@ -1,13 +1,13 @@
 ﻿#region license
 
 // Copyright 2004-2012 Castle Project, Henrik Feldt &contributors - https://github.com/castleproject
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -88,41 +88,34 @@ namespace DryIoc.Facilities.AutoTx
 
 			_State = InterceptorState.Active;
 
-			try
+			if (!mTxData.HasValue)
 			{
-				if (!mTxData.HasValue)
+				if (mTxMethod.HasValue && mTxMethod.Value.Mode == TransactionScopeOption.Suppress)
 				{
-					if (mTxMethod.HasValue && mTxMethod.Value.Mode == TransactionScopeOption.Suppress)
-					{
-						if (_Logger.IsEnabled(LogLevel.Information))
-							_Logger.LogInformation("supressing ambient transaction");
+					if (_Logger.IsEnabled(LogLevel.Information))
+						_Logger.LogInformation("supressing ambient transaction");
 
-						using (new TxScope(null, _AutoTxOptions.AmbientTransaction, _LoggerFactory.CreateChildLogger("TxScope", GetType())))
-							invocation.Proceed();
-					}
-					else invocation.Proceed();
-
-					return;
+					using (new TxScope(null, _AutoTxOptions.AmbientTransaction, _LoggerFactory.CreateChildLogger("TxScope", GetType())))
+						invocation.Proceed();
 				}
+				else invocation.Proceed();
 
-				var transaction = mTxData.Value.Transaction;
-				Contract.Assume(transaction.State == TransactionState.Active,
-				                "from post-condition of ITransactionManager CreateTransaction in the (HasValue -> ...)-case");
-
-				if (mTxData.Value.ShouldFork)
-				{
-					if (_AutoTxOptions.AmbientTransaction == AmbientTransactionOption.Disabled)
-						throw new TransactionException("Forking is not supported if ambient transactions are disabled");
-
-					var task = ForkCase(invocation, mTxData.Value);
-					txManagerC.EnlistDependentTask(task);
-				}
-				else SynchronizedCase(invocation, transaction);
+				return;
 			}
-			finally
+
+			var transaction = mTxData.Value.Transaction;
+			Contract.Assume(transaction.State == TransactionState.Active,
+			                "from post-condition of ITransactionManager CreateTransaction in the (HasValue -> ...)-case");
+
+			if (mTxData.Value.ShouldFork)
 			{
-				_Container.Release(txManagerC);
+				if (_AutoTxOptions.AmbientTransaction == AmbientTransactionOption.Disabled)
+					throw new TransactionException("Forking is not supported if ambient transactions are disabled");
+
+				var task = ForkCase(invocation, mTxData.Value);
+				txManagerC.EnlistDependentTask(task);
 			}
+			else SynchronizedCase(invocation, transaction);
 		}
 
 		private void SynchronizedCase(IInvocation invocation, ITransaction transaction)
@@ -245,15 +238,20 @@ namespace DryIoc.Facilities.AutoTx
 							_Logger.LogDebug("in finally-clause, completing dependent if it didn't throw exception");
 
 						if (!hasException)
+						{
 							dependent.Complete();
+						}
 
-						if (Finally != null) 
-							Finally.Set();
+						Finally?.Set();
 
 						// See footnote at end of file
 					}
 				}
-			}, Tuple.Create(invocation, txData, txData.Transaction.LocalIdentifier));
+			}, Tuple.Create(invocation, txData, txData.Transaction.LocalIdentifier),
+				CancellationToken.None,
+				TaskCreationOptions.None,
+				TaskScheduler.Default
+			);
 		}
 
 		private void SetInterceptedComponentModel(ParentServiceRequestInfo target)
@@ -283,10 +281,10 @@ namespace DryIoc.Facilities.AutoTx
 	//     at Castle.Facilities.AutoTx.TransactionInterceptor.<ForkCase>b__4(Object t) in f:\code\castle\Castle.Services.Transaction\src\Castle.Facilities.AutoTx\TransactionInterceptor.cs:line 144
 	//     at System.Threading.Tasks.Task.InnerInvoke()
 	//     at System.Threading.Tasks.Task.Execute()
-	//InnerException: 
+	//InnerException:
 	//dependent.Complete();
 
 	// Second wrong; calling dispose on it
 	// MSDN-article is wrong; transaction is disposed twice in their code:
-	// tuple.Item2.Dispose(); 
+	// tuple.Item2.Dispose();
 }

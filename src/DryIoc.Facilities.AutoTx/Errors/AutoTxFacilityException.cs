@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace DryIoc.Facilities.AutoTx.Errors
 {
+#pragma warning disable CA2237
     public class AutoTxFacilityException : InvalidOperationException
     {
 	    public AutoTxFacilityException()

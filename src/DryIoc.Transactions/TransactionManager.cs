@@ -1,11 +1,11 @@
 ﻿// Copyright 2004-2012 Castle Project, Henrik Feldt &contributors - https://github.com/castleproject
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -76,7 +76,7 @@ namespace DryIoc.Transactions
 		Maybe<ICreatedTransaction> ITransactionManager.CreateTransaction(ITransactionOptions transactionOptions)
 		{
 			var activity = _activityManager.GetCurrentActivity();
-			
+
 			if (transactionOptions.Mode == TransactionScopeOption.Suppress)
 				return Maybe.None<ICreatedTransaction>();
 
@@ -135,9 +135,9 @@ namespace DryIoc.Transactions
 			Contract.Requires(task != null);
 			_activityManager.GetCurrentActivity().EnlistDependentTask(task);
 		}
-		
+
 		[SuppressMessage("Microsoft.Design", "CA1034:ImplementIDisposableCorrectly")]
-		public class DisposableScope : IDisposable
+		public sealed class DisposableScope : IDisposable
 		{
 			readonly Func<ITransaction> _onDispose;
 
@@ -147,7 +147,7 @@ namespace DryIoc.Transactions
 				_onDispose = onDispose;
 			}
 
-			[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly"), 
+			[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly"),
 			 SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
 			public void Dispose()
 			{
