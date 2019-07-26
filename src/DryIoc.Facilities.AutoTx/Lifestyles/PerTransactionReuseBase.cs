@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using DryIoc.Facilities.AutoTx.Extensions;
-#if NET461
-using Expr = FastExpressionCompiler.ExpressionInfo;
-#else
-using Expr = System.Linq.Expressions.Expression;
-#endif
+using FastExpressionCompiler.LightExpression;
 
 namespace DryIoc.Facilities.AutoTx.Lifestyles
 {
@@ -38,15 +34,15 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			typeof(PerTransactionReuseBase).GetSingleMethodOrNull("GetOrAddItemOrDefault");
 
 		/// <summary>Returns expression call to <see cref="GetOrAddItemOrDefault"/>.</summary>
-		public Expr Apply(Request request, Expr serviceFactoryExpr)
+		public Expression Apply(Request request, Expression serviceFactoryExpr)
 		{
 			var itemId = request.TracksTransientDisposable ? -1 : request.FactoryID;
 
-			return Expr.Call(_GetOrAddOrDefaultMethod,
-				Expr.Constant(_PerTransactionScopeContextBase),
-				Expr.Constant(request),
-				Expr.Constant(itemId),
-				Expr.Lambda<CreateScopedValue>(serviceFactoryExpr));
+			return Expression.Call(_GetOrAddOrDefaultMethod,
+				Expression.Constant(_PerTransactionScopeContextBase),
+				Expression.Constant(request),
+				Expression.Constant(itemId),
+				Expression.Lambda<CreateScopedValue>(serviceFactoryExpr));
 		}
 
 		public bool CanApply(Request request)
@@ -54,7 +50,7 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			return _PerTransactionScopeContextBase.IsCurrentTransaction;
 		}
 
-		public abstract Expr ToExpression(Func<object, Expr> fallbackConverter);
+		public abstract Expression ToExpression(Func<object, Expression> fallbackConverter);
 	}
 
 	public class PerTransactionReuse : PerTransactionReuseBase
@@ -65,10 +61,10 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 
 		public override int Lifespan => 50;
 
-		public static readonly Lazy<Expr> PerTransactionReuseExpr = new Lazy<Expr>(() =>
-			Expr.Property(null, typeof(AutoTxReuse).GetPropertyOrNull("PerTransaction")));
+		public static readonly Lazy<Expression> PerTransactionReuseExpr = new Lazy<Expression>(() =>
+			Expression.Property(null, typeof(AutoTxReuse).GetPropertyOrNull("PerTransaction")));
 
-		public override Expr ToExpression(Func<object, Expr> fallbackConverter)
+		public override Expression ToExpression(Func<object, Expression> fallbackConverter)
 		{
 			return PerTransactionReuseExpr.Value;
 		}
@@ -82,10 +78,10 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 
 		public override int Lifespan => 55;
 
-		public static readonly Lazy<Expr> PerTopTransactionReuseExpr = new Lazy<Expr>(() =>
-			Expr.Property(null, typeof(AutoTxReuse).GetPropertyOrNull("PerTopTransaction")));
+		public static readonly Lazy<Expression> PerTopTransactionReuseExpr = new Lazy<Expression>(() =>
+			Expression.Property(null, typeof(AutoTxReuse).GetPropertyOrNull("PerTopTransaction")));
 
-		public override Expr ToExpression(Func<object, Expr> fallbackConverter)
+		public override Expression ToExpression(Func<object, Expression> fallbackConverter)
 		{
 			return PerTopTransactionReuseExpr.Value;
 		}

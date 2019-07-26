@@ -1,11 +1,11 @@
 ﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -138,10 +138,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 				get { return Maybe.None<IInterceptor>(); }
 			}
 
-			public Configuration Config
-			{
-				get { return new ExampleInstaller().Config; }
-			}
+			public Configuration Config => new ExampleInstaller(nameof(C1)).Config;
 
 			public void Registered(ISessionFactory factory)
 			{
@@ -179,10 +176,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 				get { return Maybe.None<IInterceptor>(); }
 			}
 
-			public Configuration Config
-			{
-				get { return new ExampleInstaller().Config; }
-			}
+			public Configuration Config => new ExampleInstaller(nameof(C2)).Config;
 
 			public void Registered(ISessionFactory factory)
 			{
@@ -220,10 +214,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 				get { return Maybe.None<IInterceptor>(); }
 			}
 
-			public Configuration Config
-			{
-				get { return new ExampleInstaller().Config; }
-			}
+			public Configuration Config => new ExampleInstaller(nameof(C1_Copy)).Config;
 
 			public void Registered(ISessionFactory factory)
 			{

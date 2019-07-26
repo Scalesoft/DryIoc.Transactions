@@ -1,11 +1,11 @@
 ﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,11 +30,11 @@ using ILoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 namespace DryIoc.Facilities.NHibernate
 {
 	///<summary>
-	///	Easy NHibernate integration with declarative transactions 
+	///	Easy NHibernate integration with declarative transactions
 	///	using Castle Transaction Services and .Net System.Transactions.
-	///	Integrate Transactional NTFS with NHibernate and database transactions, 
-	///	or choose methods to fork dependent transactions for to run your transaction 
-	///	constituents in parallel. The NHibernate Facility is configured 
+	///	Integrate Transactional NTFS with NHibernate and database transactions,
+	///	or choose methods to fork dependent transactions for to run your transaction
+	///	constituents in parallel. The NHibernate Facility is configured
 	///	using FluentNHibernate
 	///</summary>
 	public class NHibernateFacility
@@ -176,7 +176,7 @@ namespace DryIoc.Facilities.NHibernate
 			var installed = installers
 				.Select(x =>
 				{
-					Configuration configuration = x.Deserialize();
+					var configuration = x.Deserialize();
 
 					if (configuration == null)
 					{
@@ -207,7 +207,7 @@ namespace DryIoc.Facilities.NHibernate
 					{
 						throw new InvalidOperationException("Can't register more than one default NHibernateFacility");
 					}
-					
+
 					container.UseInstance(x.Config, serviceKey: $"{x.Instance.SessionFactoryKey}-cfg");
 					container.UseInstance(x.Factory, serviceKey: x.Instance.SessionFactoryKey);
 

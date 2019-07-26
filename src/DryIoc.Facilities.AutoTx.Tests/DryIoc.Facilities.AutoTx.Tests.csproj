@@ -31,12 +31,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DryIoc.dll" Version="3.0.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
-    <PackageReference Include="NLog" Version="4.5.9" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.2.1" />
-    <PackageReference Include="NUnit" Version="3.10.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="DryIoc.dll" Version="4.0.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="NLog" Version="4.6.6" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.5.2" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     <PackageReference Include="SharpTestsEx" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>

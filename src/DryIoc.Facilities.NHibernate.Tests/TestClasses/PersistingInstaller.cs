@@ -9,7 +9,9 @@ namespace DryIoc.Facilities.NHibernate.Tests.TestClasses
 		public const string SerializedConfigFile = "NHibernateConfig.cache";
 		private readonly IConfigurationPersister _persister;
 
-		public PersistingInstaller(IConfigurationPersister persister)
+		public PersistingInstaller(
+			IConfigurationPersister persister
+		) : base(nameof(PersistingInstaller))
 		{
 			_persister = persister;
 		}

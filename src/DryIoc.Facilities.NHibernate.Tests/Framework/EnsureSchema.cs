@@ -1,11 +1,11 @@
 // Copyright 2004-2011 Castle Project - http://www.castleproject.org/
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using DryIoc.Facilities.NHibernate.Tests.TestClasses;
+using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
 using NUnit.Framework;
 
@@ -23,8 +24,18 @@ namespace DryIoc.Facilities.NHibernate.Tests.Framework
 	    [OneTimeSetUp]
 		public void Setup()
 		{
-			var configuration = new ExampleInstaller().Config;
-			new SchemaUpdate(configuration).Execute(true, true);
+			var configuration = new ExampleInstaller(nameof(EnsureSchema)).Config;
+
+			BuildSchema(configuration);
+
+			//new SchemaUpdate(configuration).Execute(true, true);
+		}
+
+		private static void BuildSchema(Configuration configuration)
+		{
+			var schemaExport = new SchemaExport(configuration);
+			schemaExport.Drop(false, true);
+			schemaExport.Create(false, true);
 		}
 	}
 }
