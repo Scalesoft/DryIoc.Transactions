@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
 using DryIoc.Facilities.NHibernate.Tests.EntityMappings;
 using DryIoc.Transactions;
@@ -24,7 +23,6 @@ using NHibernate.Cfg;
 using NHibernate.Cfg.MappingSchema;
 using NHibernate.Connection;
 using NHibernate.Dialect;
-using NHibernate.Driver;
 using NHibernate.Mapping.ByCode;
 using Environment = NHibernate.Cfg.Environment;
 
@@ -32,25 +30,16 @@ namespace DryIoc.Facilities.NHibernate.Tests.TestClasses
 {
 	internal class ExampleInstaller : INHibernateInstaller
 	{
-		private readonly string _DatabaseFileName;
-		private const string ConnectionString = "Data Source=db-{0}.db;Version=3";
-
 		public const string Key = "sf.default";
 		private readonly Maybe<IInterceptor> interceptor;
 
-		public ExampleInstaller() : this(nameof(ExampleInstaller))
+		public ExampleInstaller()
 		{
-		}
-
-		public ExampleInstaller(string databaseFileName)
-		{
-			_DatabaseFileName = databaseFileName;
 			interceptor = Maybe.None<IInterceptor>();
 		}
 
-		public ExampleInstaller(string databaseFileName, IInterceptor interceptor)
+		public ExampleInstaller(IInterceptor interceptor)
 		{
-			_DatabaseFileName = databaseFileName;
 			this.interceptor = Maybe.Some(interceptor);
 		}
 
@@ -72,14 +61,11 @@ namespace DryIoc.Facilities.NHibernate.Tests.TestClasses
 				{
 					db.LogSqlInConsole = false;
 					db.LogFormattedSql = true;
-					db.Dialect<SQLiteDialect>();
-					db.Driver<SQLite20Driver>();
+
 					db.ConnectionProvider<DriverConnectionProvider>();
-					db.ConnectionString = string.Format(
-						CultureInfo.InvariantCulture,
-						ConnectionString,
-						_DatabaseFileName
-					);
+					db.ConnectionString = connectionString;
+
+					AppConfig.SetupConnection(db);
 				})
 				.SetProperty(Environment.CurrentSessionContextClass, "thread_static");
 

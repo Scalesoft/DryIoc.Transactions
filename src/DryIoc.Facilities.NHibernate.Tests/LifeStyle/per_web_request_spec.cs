@@ -60,7 +60,7 @@ namespace DryIoc.Facilities.NHibernate.Tests.LifeStyle
 			}
 			catch (InvalidOperationException e)
 			{
-				Assert.That(e.Message, Does.Contain("No current scope available"));
+				Assert.That(e.Message, Does.Contain("No current scope is available"));
 			}
 		}
 

@@ -54,6 +54,11 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 			Contract.Ensures(_Lifestyle1 != null);
 			Contract.Ensures(_Initialized);
 
+			if (request == null)
+			{
+				throw new ArgumentNullException(nameof(request));
+			}
+
 			var kernel = request.Container;
 
 			// check ILoggerFactory is registered

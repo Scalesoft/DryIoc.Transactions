@@ -25,7 +25,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 		public void NonNullInterceptor()
 		{
 			var w = new Container();
-			w.UseInstance<INHibernateInstaller>(new ExampleInstaller(nameof(InterceptorTests), new ThrowingInterceptor()));
+			w.UseInstance<INHibernateInstaller>(new ExampleInstaller(new ThrowingInterceptor()));
 			w.AddAutoTx();
 			w.AddNHibernate();
 

@@ -24,11 +24,11 @@ namespace DryIoc.Facilities.NHibernate.Tests.Framework
 	    [OneTimeSetUp]
 		public void Setup()
 		{
-			var configuration = new ExampleInstaller(nameof(EnsureSchema)).Config;
+			var configuration = new ExampleInstaller().Config;
 
-			BuildSchema(configuration);
+			//BuildSchema(configuration);
 
-			//new SchemaUpdate(configuration).Execute(true, true);
+			new SchemaUpdate(configuration).Execute(true, true);
 		}
 
 		private static void BuildSchema(Configuration configuration)

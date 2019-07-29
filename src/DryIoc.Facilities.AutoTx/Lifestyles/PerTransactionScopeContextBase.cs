@@ -70,7 +70,9 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 				if (_Logger.IsEnabled(LogLevel.Debug))
 					_Logger.LogDebug($"Scope for key '{key}' not found in per-tx storage. Creating new Scope instance.");
 
+#pragma warning disable CA2000
 				scope = new Scope(name: RootScopeName);
+#pragma warning restore CA2000
 				_ScopePerTransactionIdStorage.TryAdd(key, scope);
 
 				transaction.Inner.TransactionCompleted += (sender, args) =>

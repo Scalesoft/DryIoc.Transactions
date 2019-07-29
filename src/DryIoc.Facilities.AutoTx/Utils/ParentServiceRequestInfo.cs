@@ -9,6 +9,11 @@ namespace DryIoc.Facilities.AutoTx.Utils
 
 		public ParentServiceRequestInfo(Request requestInfo, ProxyTypeStorage proxyTypeStorage)
 		{
+			if (requestInfo == null)
+			{
+				throw new ArgumentNullException(nameof(requestInfo));
+			}
+
 			_ProxyTypeStorage = proxyTypeStorage;
 			RequestInfo = requestInfo.Parent.Parent;
 		}

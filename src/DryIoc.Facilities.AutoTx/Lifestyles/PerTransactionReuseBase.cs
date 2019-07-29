@@ -26,8 +26,19 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 		/// <returns>Reused item.</returns>
 		public static object GetOrAddItemOrDefault(PerTransactionScopeContextBase scopeContext, Request request, int itemId, CreateScopedValue createValue)
 		{
+			if (scopeContext == null)
+			{
+				throw new ArgumentNullException(nameof(scopeContext));
+			}
+			if (request == null)
+			{
+				throw new ArgumentNullException(nameof(request));
+			}
+
+#pragma warning disable CA2000
 			var scope = scopeContext.GetCurrentOrDefault(request.ServiceType);
-			return scope == null ? null : scope.GetOrAdd(itemId, createValue);
+#pragma warning restore CA2000
+			return scope?.GetOrAdd(itemId, createValue);
 		}
 
 		private static readonly MethodInfo _GetOrAddOrDefaultMethod =
@@ -36,6 +47,11 @@ namespace DryIoc.Facilities.AutoTx.Lifestyles
 		/// <summary>Returns expression call to <see cref="GetOrAddItemOrDefault"/>.</summary>
 		public Expression Apply(Request request, Expression serviceFactoryExpr)
 		{
+			if (request == null)
+			{
+				throw new ArgumentNullException(nameof(request));
+			}
+
 			var itemId = request.TracksTransientDisposable ? -1 : request.FactoryID;
 
 			return Expression.Call(_GetOrAddOrDefaultMethod,

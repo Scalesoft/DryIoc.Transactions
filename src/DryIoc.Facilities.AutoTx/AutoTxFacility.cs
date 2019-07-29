@@ -1,17 +1,18 @@
 // Copyright 2004-2012 Castle Project, Henrik Feldt &contributors - https://github.com/castleproject
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Diagnostics;
 using DryIoc.Facilities.AutoTx.Extensions;
 using DryIoc.Facilities.AutoTx.Lifestyles;
@@ -30,8 +31,14 @@ namespace DryIoc.Facilities.AutoTx
 	///</summary>
 	public class AutoTxFacility
 	{
+#pragma warning disable CA1822
 		public void Init(IContainer container, AmbientTransactionOption ambientTransaction)
 		{
+			if (container == null)
+			{
+				throw new ArgumentNullException(nameof(container));
+			}
+
 			ILogger _Logger = NullLogger.Instance;
 
 			// check we have a logger factory
@@ -62,7 +69,7 @@ namespace DryIoc.Facilities.AutoTx
 			// add capability to inject info about requested service to the constructor
 			container.Register<ProxyTypeStorage>(Reuse.Singleton);
 			container.Register(Made.Of(
-				() => new ParentServiceRequestInfo(Arg.Index<Request>(0), Arg.Of<ProxyTypeStorage>()), 
+				() => new ParentServiceRequestInfo(Arg.Index<Request>(0), Arg.Of<ProxyTypeStorage>()),
 				request => request), setup: Setup.With(asResolutionCall: true));
 
 			// register PerTransactionScopeContext to container as singleton (one storage for scope-per-transaction)
@@ -86,7 +93,7 @@ namespace DryIoc.Facilities.AutoTx
 			});
 
 			var componentInspector = new TransactionalComponentInspector(container);
-			
+
 			_Logger.LogDebug(
 				"inspecting previously registered components; this might throw if you have configured your components in the wrong way");
 
@@ -118,5 +125,7 @@ CurrentTransaction property and invoke Rollback on it. Be ready to catch Transac
 debugging through log4net.
 ");
 		}
+#pragma warning restore CA1822
+
 	}
 }

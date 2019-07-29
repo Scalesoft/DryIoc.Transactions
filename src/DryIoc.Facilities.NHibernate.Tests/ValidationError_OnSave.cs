@@ -73,7 +73,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 		public static Container Create(AmbientTransactionOption ambientTransaction)
 		{
 			var container = new Container();
-			container.UseInstance<INHibernateInstaller>(new ExampleInstaller(nameof(ContainerBuilder), new ThrowingInterceptor()));
+			container.UseInstance<INHibernateInstaller>(new ExampleInstaller(new ThrowingInterceptor()));
 
 			container.Register<Test>(Reuse.Transient);
 			container.Register<NestedTransactionService>(Reuse.Transient);
@@ -90,7 +90,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 		private static readonly Logger _Logger = LogManager.GetCurrentClassLogger();
 
 		public bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState,
-														 string[] propertyNames, IType[] types)
+			string[] propertyNames, IType[] types)
 		{
 			_Logger.Debug("throwing validation exception");
 
@@ -104,8 +104,10 @@ namespace DryIoc.Facilities.NHibernate.Tests
 			return false;
 		}
 
-		public int[] FindDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames,
-													 IType[] types)
+		public int[] FindDirty(
+			object entity, object id, object[] currentState, object[] previousState, string[] propertyNames,
+			IType[] types
+		)
 		{
 			return null;
 		}
@@ -247,7 +249,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 		{
 			var s = _SessionManager.OpenSession();
 			var thing = new Thing(18.0);
-			_ThingId = (Guid)s.Save(thing);
+			_ThingId = (Guid) s.Save(thing);
 		}
 
 		[Transaction]
@@ -256,7 +258,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 			using (var s = _SessionManager.OpenSession())
 			{
 				var thing = new Thing(37.0);
-				_ThingId = (Guid)s.Save(thing);
+				_ThingId = (Guid) s.Save(thing);
 				s.Flush();
 
 				throw new InvalidOperationException("Artificial error after saving item");

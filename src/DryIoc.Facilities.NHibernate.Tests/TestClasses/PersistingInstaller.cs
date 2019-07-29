@@ -11,7 +11,7 @@ namespace DryIoc.Facilities.NHibernate.Tests.TestClasses
 
 		public PersistingInstaller(
 			IConfigurationPersister persister
-		) : base(nameof(PersistingInstaller))
+		)
 		{
 			_persister = persister;
 		}

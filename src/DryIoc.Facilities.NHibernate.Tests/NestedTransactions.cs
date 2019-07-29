@@ -1,11 +1,11 @@
 ﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -118,7 +118,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 		[Transaction]
 		public virtual void Run()
 		{
-			
+
 			SaveNewThing();
 			SaveNewThing();
 		}
@@ -133,7 +133,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 			SaveNewThing();
 
 			//Assert
-			Assert.AreEqual(thingCount + 1, GetThingsCount(), "New thing was created, but transaction is not commited yet");
+			Assert.AreEqual(thingCount + 1, GetThingsCount(), "New thing was created, but transaction is not committed yet");
 		}
 
 		[Transaction]
@@ -144,9 +144,9 @@ namespace DryIoc.Facilities.NHibernate.Tests
 			//Force a Fail so I can test the nested rollback
 			throw new Exception();
 
-			
+
 		}
-		
+
 
 		[Transaction]
 		protected virtual void SaveNewThing()

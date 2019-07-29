@@ -138,7 +138,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 				get { return Maybe.None<IInterceptor>(); }
 			}
 
-			public Configuration Config => new ExampleInstaller(nameof(C1)).Config;
+			public Configuration Config => new ExampleInstaller().Config;
 
 			public void Registered(ISessionFactory factory)
 			{
@@ -176,7 +176,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 				get { return Maybe.None<IInterceptor>(); }
 			}
 
-			public Configuration Config => new ExampleInstaller(nameof(C2)).Config;
+			public Configuration Config => new ExampleInstaller().Config;
 
 			public void Registered(ISessionFactory factory)
 			{
@@ -214,7 +214,7 @@ namespace DryIoc.Facilities.NHibernate.Tests
 				get { return Maybe.None<IInterceptor>(); }
 			}
 
-			public Configuration Config => new ExampleInstaller(nameof(C1_Copy)).Config;
+			public Configuration Config => new ExampleInstaller().Config;
 
 			public void Registered(ISessionFactory factory)
 			{

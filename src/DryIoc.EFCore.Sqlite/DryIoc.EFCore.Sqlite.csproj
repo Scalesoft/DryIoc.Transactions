@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
     <Copyright>Copyright (c) .NET Foundation and Contributors</Copyright>
     <Version>0.2.2</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -21,6 +21,7 @@
     <None Update="Properties\SqliteStrings.Designer.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
+    <None Include="..\..\License.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
