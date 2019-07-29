@@ -50,6 +50,7 @@ namespace DryIoc.Facilities.NHibernate.Tests.TestClasses
 
 		public ExampleInstaller(string databaseFileName, IInterceptor interceptor)
 		{
+			_DatabaseFileName = databaseFileName;
 			this.interceptor = Maybe.Some(interceptor);
 		}
 
@@ -74,8 +75,11 @@ namespace DryIoc.Facilities.NHibernate.Tests.TestClasses
 					db.Dialect<SQLiteDialect>();
 					db.Driver<SQLite20Driver>();
 					db.ConnectionProvider<DriverConnectionProvider>();
-					db.ConnectionString =
-						string.Format(CultureInfo.InvariantCulture, ConnectionString, _DatabaseFileName);
+					db.ConnectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						ConnectionString,
+						_DatabaseFileName
+					);
 				})
 				.SetProperty(Environment.CurrentSessionContextClass, "thread_static");
 
@@ -93,11 +97,11 @@ namespace DryIoc.Facilities.NHibernate.Tests.TestClasses
 			return null;
 		}
 
-		public virtual void Serialize(global::NHibernate.Cfg.Configuration configuration)
+		public virtual void Serialize(Configuration configuration)
 		{
 		}
 
-		public virtual void AfterDeserialize(global::NHibernate.Cfg.Configuration configuration)
+		public virtual void AfterDeserialize(Configuration configuration)
 		{
 		}
 
