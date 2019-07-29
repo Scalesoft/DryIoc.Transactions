@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks><!--Multiple targets because of incompatibility of DryIoc.IReuse interface on different frameworks-->
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>DryIoc.Facilities.AutoTx</AssemblyName>
     <PackageId>DryIoc.Facilities.AutoTx</PackageId>
 	<CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
