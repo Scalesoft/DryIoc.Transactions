@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DryIoc.Facilities.EFCore.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DryIoc.EFCore.Sqlite", "src\DryIoc.EFCore.Sqlite\DryIoc.EFCore.Sqlite.csproj", "{F3AD4CEE-8B19-4277-80BC-5770C7DC2AB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DryIoc.Facilities.NHibernate.ExampleConsoleAppCore", "src\DryIoc.Facilities.NHibernate.ExampleConsoleAppCore\DryIoc.Facilities.NHibernate.ExampleConsoleAppCore.csproj", "{AA96474C-B688-4524-8E7B-FDCBE4146823}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,12 +79,17 @@ Global
 		{F3AD4CEE-8B19-4277-80BC-5770C7DC2AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3AD4CEE-8B19-4277-80BC-5770C7DC2AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3AD4CEE-8B19-4277-80BC-5770C7DC2AB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA96474C-B688-4524-8E7B-FDCBE4146823}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA96474C-B688-4524-8E7B-FDCBE4146823}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA96474C-B688-4524-8E7B-FDCBE4146823}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA96474C-B688-4524-8E7B-FDCBE4146823}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9B977E07-808A-4773-B378-EB3665679082} = {7DF64674-D6C1-4D7A-BD6B-D5741CE670A3}
+		{AA96474C-B688-4524-8E7B-FDCBE4146823} = {7DF64674-D6C1-4D7A-BD6B-D5741CE670A3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C6675926-9666-4D4A-AE48-05F41DBE8908}
