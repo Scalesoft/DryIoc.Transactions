@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <Copyright>Copyright (c) .NET Foundation and Contributors</Copyright>
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>..\..\build\</PackageOutputPath>
