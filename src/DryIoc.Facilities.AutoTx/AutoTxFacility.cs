@@ -77,7 +77,7 @@ namespace DryIoc.Facilities.AutoTx
 			container.Register<PerTopTransactionScopeContext>(Reuse.Singleton);
 
 			// the interceptor needs to be created for every method call
-			container.Register<TransactionInterceptor>(Reuse.Transient);
+			container.Register<TransactionInterceptor>(Reuse.Transient, setup: Setup.With(asResolutionCall: true));
 			container.Register<ITransactionMetaInfoStore, TransactionClassMetaInfoStore>(Reuse.Singleton);
 			container.RegisterMany(new[] {typeof(ITransactionManager), typeof(TransactionManager)}, typeof(TransactionManager), Reuse.Singleton);
 
