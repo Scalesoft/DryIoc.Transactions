@@ -1,6 +1,6 @@
 ﻿using System;
+using DryIoc.Transactions.Helpers;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions.Internal;
 
 namespace DryIoc.Transactions.Logging
 {
