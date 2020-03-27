@@ -6,10 +6,7 @@ Param(
     [String]$apiKey,
 
     [Parameter(Mandatory = $true)]
-    [String]$packageVersion,
-
-    [Parameter()]
-    [Switch]$disableRestore = $false
+    [String]$packageVersion
 )
 
 $currentPath = (Get-Location -PSProvider FileSystem).ProviderPath
@@ -24,14 +21,9 @@ if ($packageVersion[0] -eq 'v')
     $packageVersion = $packageVersion.Substring(1)
 }
 
-if (!$disableRestore)
-{
-    dotnet restore
-}
-
 # `dotnet build` must run before `dotnet publish` because GeneratePackageOnBuild in csproj forces not to build when running `dotnet publish` command
 # https://github.com/dotnet/core/issues/1778
-dotnet build --no-restore -c Release "/property:Version=${packageVersion}"
+dotnet build -c Release "/property:Version=${packageVersion}"
 
 dotnet publish --no-restore -c Release --no-build
 
